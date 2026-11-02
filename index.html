@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GadgetKu Store - Pusat Jual Beli HP Terpercaya</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Smooth transitions & custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col antialiased">
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Header / Navbar -->
+    <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20 gap-4">
+                
+                <!-- Logo -->
+                <div class="flex items-center gap-3 cursor-pointer" onclick="resetFilters()">
+                    <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
+                        <i class="fa-solid font-bold fa-mobile-screen-button text-xl"></i>
+                    </div>
+                    <div>
+                        <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">GadgetKu</span>
+                        <span class="block text-[10px] font-semibold text-slate-400 tracking-wider uppercase">Store & Trade-In</span>
+                    </div>
+                </div>
+
+                <!-- Search Bar (Desktop) -->
+                <div class="hidden md:flex flex-1 max-w-md mx-6">
+                    <div class="relative w-full">
+                        <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Cari nama HP, merk, RAM..." class="w-full pl-10 pr-4 py-2.5 bg-slate-100 border border-transparent rounded-xl text-sm focus:outline-none focus:bg-white focus:border-blue-500 transition-all">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-400 text-sm"></i>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex items-center gap-3">
+                    <!-- Tombol Tambah HP -->
+                    <button onclick="openModal('addProductModal')" class="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-4 py-2.5 rounded-xl font-medium text-sm transition-all shadow-sm active:scale-95">
+                        <i class="fa-solid fa-plus text-xs"></i>
+                        <span class="hidden sm:inline">Tambah HP</span>
+                    </button>
+
+                    <!-- Tombol Metode Pembayaran -->
+                    <button onclick="openModal('paymentModal')" class="p-2.5 text-slate-600 hover:text-blue-600 hover:bg-slate-100 rounded-xl transition-all relative" title="Metode Pembayaran">
+                        <i class="fa-solid fa-wallet text-lg"></i>
+                    </button>
+
+                    <!-- Etalase / Cart Counter -->
+                    <button onclick="openModal('cartModal')" class="flex items-center gap-2 bg-blue-50 text-blue-600 hover:bg-blue-100 px-4 py-2.5 rounded-xl font-semibold text-sm transition-all relative">
+                        <i class="fa-solid fa-bag-shopping text-base"></i>
+                        <span class="hidden sm:inline">Etalase</span>
+                        <span id="cartCount" class="bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full font-bold ml-1">0</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Search Bar (Mobile) -->
+            <div class="pb-3 md:hidden">
+                <div class="relative w-full">
+                    <input type="text" id="searchInputMobile" oninput="handleSearchMobile()" placeholder="Cari tipe HP atau merk..." class="w-full pl-10 pr-4 py-2 bg-slate-100 border border-transparent rounded-xl text-sm focus:outline-none focus:bg-white focus:border-blue-500 transition-all">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-sm"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow">
+        <!-- Hero Section -->
+        <section class="bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white py-12 md:py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+            <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#3b82f6_1px,transparent_1px)] [background-size:16px_16px]"></div>
+            <div class="max-w-7xl mx-auto relative z-10 text-center">
+                <span class="inline-block px-3 py-1 rounded-full bg-blue-500/10 border border-blue-400/20 text-blue-400 text-xs font-semibold uppercase tracking-wider mb-4">
+                    <i class="fa-solid fa-bolt mr-1"></i> Promo Spesial Bulan Ini
+                </span>
+                <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight max-w-3xl mx-auto leading-tight">
+                    Upgrade Smartphone Impianmu dengan Harga Terbaik
+                </h1>
+                <p class="mt-4 text-slate-300 max-w-2xl mx-auto text-sm sm:text-base">
+                    Pusat jual-beli HP baru & second berkualitas garansi resmi. Transaksi aman via WhatsApp & bebas pilih pembayaran Transfer Bank / E-Wallet.
+                </p>
+                <div class="mt-8 flex flex-wrap justify-center gap-4">
+                    <a href="#catalogSection" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-lg shadow-blue-500/25 flex items-center gap-2">
+                        Lihat Katalok HP <i class="fa-solid fa-arrow-down text-sm"></i>
+                    </a>
+                    <button onclick="openModal('paymentModal')" class="bg-slate-700/60 hover:bg-slate-700 text-white border border-slate-600 font-semibold px-6 py-3 rounded-xl transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-credit-card text-sm"></i> Info Pembayaran
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Content & Catalog -->
+        <section id="catalogSection" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            
+            <!-- Category Filter Tabs -->
+            <div class="flex flex-col gap-4 mb-8">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-layer-group text-blue-600"></i> Pilih Merk Smartphone
+                    </h2>
+                    <span id="productCountBadge" class="text-xs font-semibold text-slate-500 bg-slate-200 px-2.5 py-1 rounded-lg">Menampilkan 0 Produk</span>
+                </div>
+
+                <!-- Brand Badges Filter -->
+                <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none" id="brandFilterContainer">
+                    <!-- Dynamic Brand Buttons populated by JS -->
+                </div>
+            </div>
+
+            <!-- Product Grid -->
+            <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <!-- Dynamic Card Content injected by JS -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="hidden text-center py-16 bg-white rounded-3xl border border-dashed border-slate-300 my-6">
+                <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto text-slate-400 text-2xl mb-4">
+                    <i class="fa-solid fa-mobile-xmark"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-700">HP Tidak Ditemukan</h3>
+                <p class="text-slate-500 text-sm mt-1 max-w-sm mx-auto">Tidak ada smartphone yang cocok dengan kriteria pencarian atau filter Anda.</p>
+                <button onclick="resetFilters()" class="mt-4 text-sm font-semibold text-blue-600 hover:text-blue-700 underline">Reset Filter & Search</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-12 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white">
+                        <i class="fa-solid fa-mobile-screen-button"></i>
+                    </div>
+                    <span class="text-xl font-extrabold text-white">GadgetKu</span>
+                </div>
+                <p class="text-sm leading-relaxed text-slate-400">
+                    Platform terbaik untuk beli & jual smartphone impian Anda. Terpercaya, transparan, dan bergaransi resmi.
+                </p>
+            </div>
+
+            <div>
+                <h4 class="text-white font-bold text-sm uppercase tracking-wider mb-4">Kontak Resmi & Bantuan</h4>
+                <ul class="space-y-2.5 text-sm">
+                    <li><a href="https://wa.me/6281234567890" target="_blank" class="hover:text-emerald-400 transition-colors flex items-center gap-2"><i class="fa-brands fa-whatsapp text-emerald-500"></i> CS WhatsApp: 0812-3456-7890</a></li>
+                    <li class="flex items-center gap-2"><i class="fa-solid fa-envelope text-blue-400"></i> support@gadgetku.com</li>
+                    <li class="flex items-start gap-2"><i class="fa-solid fa-location-dot text-rose-400 mt-1"></i> Jl. Gadget Raya No. 88, Central Digital Park, Jakarta</li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="text-white font-bold text-sm uppercase tracking-wider mb-4">Dukungan Pembayaran</h4>
+                <p class="text-xs text-slate-400 mb-3">Kami menerima transfer bank dan e-wallet resmi berikut:</p>
+                <div class="flex flex-wrap gap-2 text-xs font-semibold">
+                    <span class="bg-slate-800 border border-slate-700 px-2.5 py-1 rounded text-slate-300">DANA</span>
+                    <span class="bg-slate-800 border border-slate-700 px-2.5 py-1 rounded text-slate-300">OVO</span>
+                    <span class="bg-slate-800 border border-slate-700 px-2.5 py-1 rounded text-slate-300">QRIS</span>
+                    <span class="bg-slate-800 border border-slate-700 px-2.5 py-1 rounded text-slate-300">BCA</span>
+                    <span class="bg-slate-800 border border-slate-700 px-2.5 py-1 rounded text-slate-300">BRI</span>
+                    <span class="bg-slate-800 border border-slate-700 px-2.5 py-1 rounded text-slate-300">MANDIRI</span>
+                    <span class="bg-slate-800 border border-slate-700 px-2.5 py-1 rounded text-slate-300">BJB</span>
+                </div>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
+            &copy; <span id="year"></span> GadgetKu Store. Hak Cipta Dilindungi Undang-Undang.
+        </div>
+    </footer>
+
+    <!-- MODAL 1: Tambah HP Baru ke Etalase -->
+    <div id="addProductModal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal('addProductModal')" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <h3 class="text-xl font-bold text-slate-800 mb-1">Tambah HP Baru ke Etalase</h3>
+            <p class="text-xs text-slate-500 mb-6">Isi formulir berikut untuk memasukkan produk smartphone baru.</p>
+
+            <form id="addProductForm" onsubmit="handleAddProduct(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Nama Tipe HP *</label>
+                    <input type="text" id="newType" required placeholder="Contoh: iPhone 15 Pro Max / Galaxy S24 Ultra" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:border-blue-500">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Merk / Brand *</label>
+                        <select id="newBrand" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:border-blue-500">
+                            <option value="iPhone">iPhone</option>
+                            <option value="Samsung">Samsung</option>
+                            <option value="Xiaomi">Xiaomi</option>
+                            <option value="Oppo">Oppo</option>
+                            <option value="Vivo">Vivo</option>
+                            <option value="Realme">Realme</option>
+                            <option value="ASUS">ASUS</option>
+                            <option value="Infinix">Infinix</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Harga (Rp) *</label>
+                        <input type="number" id="newPrice" required placeholder="15000000" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:border-blue-500">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-600 mb-1">RAM / Storage *</label>
+                        <input type="text" id="newSpecsRam" required placeholder="8GB / 256GB" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Kapasitas Baterai</label>
+                        <input type="text" id="newSpecsBattery" placeholder="5000 mAh" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:border-blue-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Chipset / Processor</label>
+                    <input type="text" id="newSpecsChipset" placeholder="Snapdragon 8 Gen 3 / Apple A17 Pro" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:border-blue-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">URL Gambar (Opsional)</label>
+                    <input type="url" id="newImageUrl" placeholder="https://..." class="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:border-blue-500">
+                    <span class="text-[10px] text-slate-400">Kosongkan jika ingin memakai placeholder gambar default.</span>
+                </div>
+
+                <div class="pt-4 flex justify-end gap-2">
+                    <button type="button" onclick="closeModal('addProductModal')" class="px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-xl">Batal</button>
+                    <button type="submit" class="px-5 py-2.5 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-md shadow-blue-500/20">Simpan Produk</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 2: Metode Pembayaran -->
+    <div id="paymentModal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal('paymentModal')" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+
+            <div class="text-center mb-6">
+                <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-2 text-xl">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+                <h3 class="text-xl font-bold text-slate-800">Opsi & Metode Pembayaran</h3>
+                <p class="text-xs text-slate-500 mt-1">Gunakan nomor rekening & e-wallet berikut untuk penyelesaian transaksi.</p>
+            </div>
+
+            <!-- TAB METODE PEMBAYARAN -->
+            <div class="space-y-6">
+                
+                <!-- Section E-Wallet -->
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-mobile-retro"></i> E-Wallet & Scan QRIS
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <!-- DANA -->
+                        <div class="p-3.5 border border-slate-200 rounded-2xl flex items-center justify-between bg-slate-50 hover:bg-white transition-all">
+                            <div class="flex items-center gap-3">
+                                <span class="bg-blue-500 text-white font-extrabold text-xs px-2.5 py-1.5 rounded-lg">DANA</span>
+                                <div>
+                                    <p class="text-xs font-semibold text-slate-800">0812-3456-7890</p>
+                                    <p class="text-[10px] text-slate-400">a.n GadgetKu Store</p>
+                                </div>
+                            </div>
+                            <button onclick="copyToClipboard('081234567890', 'Nomor DANA')" class="text-xs text-blue-600 hover:bg-blue-50 p-2 rounded-lg font-medium">Salin</button>
+                        </div>
+
+                        <!-- OVO -->
+                        <div class="p-3.5 border border-slate-200 ro
